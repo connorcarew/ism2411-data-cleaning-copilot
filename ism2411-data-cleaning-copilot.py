@@ -1,0 +1,41 @@
+import pandas as pd
+from io import StringIO
+
+# Sample data in CSV format
+data = """
+ProdName,CATEGORY,Price,qty,date_sold
+"USB Cable","Electronics",7.99,3,"2024-01-02"
+"usb cable"," electronics ",7.99,-1,"2024-01-02"
+"Laptop Stand","Office",0,2,"2024-01-03"
+"Laptop Stand","Office Supplies",24.99,, "2024-01-03"
+"Wireless Mouse","Electronics",,1,"2024-01-04"
+"wireless mouse "," electronics",15.99,1,"2024-01-04"
+"Coffee Mug","Kitchen",5.49,10,"2024-01-05"
+"coffee mug"," kitchen ",5.49,-3,"2024-01-05"
+"Notebook","Office",3.25,25,"2024-01-06"
+"Notebook ","Office",3.25,0,"2024-01-06"
+"Desk Chair","Office",89.99,1,
+"Desk Chair"," office",89.99,1,"2024-01-07"
+"Water Bottle","Fitness",12.00,4,"2024-01-07"
+"water bottle "," fitness ",,4,"2024-01-07"
+"Pen Set","Office",4.50,12,"2024-01-08"
+"Pen Set","Office",4.50,12,"2024-01-08"
+"Standing Desk","Office",199.99,1,"2024-01-08"
+"standing desk"," office furniture ",199.99,1,"2024-01-08"
+"Stapler","Office",6.25,5,"2024-01-09"
+"stapler"," office ",-6.25,5,"2024-01-09"
+"""
+
+# Read the data into a DataFrame
+df = pd.read_csv(StringIO(data))
+
+# Clean the data
+df['ProdName'] = df['ProdName'].str.strip().str.title()  # Strip whitespace and title case product names
+df['CATEGORY'] = df['CATEGORY'].str.strip().str.title()  # Strip whitespace and title case categories
+df['Price'] = pd.to_numeric(df['Price'], errors='coerce')  # Convert Price to numeric, coerce errors to NaN
+df['qty'] = pd.to_numeric(df['qty'], errors='coerce')      # Convert qty to numeric, coerce errors to NaN
+df['date_sold'] = pd.to_datetime(df['date_sold'], errors='coerce')  # Convert date_sold to datetime, coerce errors to NaT
+
+# Save the cleaned DataFrame to a CSV file
+output_path = '/Users/connorcarew/ism2411-data-cleaning-copilot/data/raw/sales_data_raw.csv'
+df.to_csv(output_path, index=False)  # Save without the index
