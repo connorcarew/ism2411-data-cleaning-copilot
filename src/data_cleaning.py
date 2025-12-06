@@ -1,53 +1,55 @@
 import pandas as pd
-import numpy as np
+import os
 
-def clean_sales_data(input_file='sales_data_raw (1).csv', output_file='sales_data_clean.csv'):
-    """
-    Clean sales data by handling duplicates, missing values, and inconsistencies.
-    """
-    # Read the CSV file
-    df = pd.read_csv(input_file, skipinitialspace=True)
+def load_data(file_path: str):
+    """Load data from a CSV file."""
+    df = pd.read_csv(file_path)
+    return df
+
+
+def clean_column_names(df):
+    """Clean column names by converting to lowercase and replacing spaces with underscores."""
+    df.columns = df.columns.str.lower().str.replace(' ', '_')
+    return df
+
+
+def clean_data(df):
+    """Clean the data by removing duplicates and handling missing values."""
+    # Remove duplicates
+    df = df.drop_duplicates()
     
-    # Clean column names - strip whitespace
-    df.columns = df.columns.str.strip()
-    
-    # Clean ProdName: strip whitespace and convert to title case
-    df['ProdName'] = df['ProdName'].str.strip().str.title()
-    
-    # Clean CATEGORY: strip whitespace, remove quotes, convert to title case
-    df['CATEGORY'] = df['CATEGORY'].str.strip().str.replace('"', '').str.strip().str.title()
-    
-    # Clean Price: ensure numeric, replace 0 with NaN
-    df['Price'] = pd.to_numeric(df['Price'], errors='coerce')
-    df.loc[df['Price'] == 0, 'Price'] = np.nan
-    
-    # Clean qty: handle negative values and missing data
-    df['qty'] = pd.to_numeric(df['qty'], errors='coerce')
-    df.loc[df['qty'] < 0, 'qty'] = np.nan
-    df.loc[df['qty'] == 0, 'qty'] = np.nan
-    
-    # Clean date_sold: standardize date format
-    df['date_sold'] = pd.to_datetime(df['date_sold'], errors='coerce')
-    
-    # Fill missing values by grouping similar products
-    for col in ['Price', 'qty', 'date_sold']:
-        if col in df.columns:
-            df[col] = df.groupby(['ProdName', 'CATEGORY'])[col].transform(
-                lambda x: x.fillna(x.mode()[0] if not x.mode().empty else x.mean())
-            )
-    
-    # Remove duplicate rows
-    df = df.drop_duplicates(subset=['ProdName', 'CATEGORY', 'Price', 'qty', 'date_sold'], keep='first')
-    
-    # Sort by date
-    df = df.sort_values('date_sold').reset_index(drop=True)
-    
-    # Save cleaned data
-    df.to_csv(output_file, index=False)
-    print(f"Cleaned data saved to {output_file}")
-    print(f"Original rows: {pd.read_csv(input_file).shape[0]}, Cleaned rows: {df.shape[0]}")
+    # Remove rows with missing values
+    df = df.dropna()
     
     return df
 
+
+def save_data(df, output_path: str):
+    """Save cleaned data to a CSV file."""
+    # Create directory if it doesn't exist
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    
+    # Save to CSV
+    df.to_csv(output_path, index=False)
+    print(f"Data saved to {output_path}")
+
+
 if __name__ == "__main__":
-    clean_sales_data()
+    # Define file paths
+    raw_data_path = "data/raw/sales_data_raw.csv"
+    processed_data_path = "data/processed/sales_data_clean.csv"
+    
+    # Load data
+    df = load_data(raw_data_path)
+    print(f"Loaded {len(df)} rows from {raw_data_path}")
+    
+    # Clean column names
+    df = clean_column_names(df)
+    print("Column names cleaned")
+    
+    # Clean data
+    df = clean_data(df)
+    print(f"Data cleaned. {len(df)} rows remaining")
+    
+    # Save cleaned data
+    save_data(df, processed_data_path)
