@@ -3,13 +3,12 @@
 Cleans sales data and put this cleaned data into a csv.
 
 ## Installation
-python
+python app.py
+# or
+python3 app.py
 
 ## Usage
-Examples of how to use your project, including code snippets if applicable.
+Cleaning and converting sales data.
 
-## Contributing
-Guidelines for contributing to the project.
-
-## License
-Information about the project's license.
+## Output
+sales data is cleaned from the raw form and placed in sales_data_clean.csv
