@@ -37,5 +37,9 @@ df['qty'] = pd.to_numeric(df['qty'], errors='coerce')      # Convert qty to nume
 df['date_sold'] = pd.to_datetime(df['date_sold'], errors='coerce')  # Convert date_sold to datetime, coerce errors to NaT
 
 # Save the cleaned DataFrame to a CSV file
-output_path = '/Users/connorcarew/ism2411-data-cleaning-copilot/data/raw/sales_data_raw.csv'
-df.to_csv(output_path, index=False)  # Save without the index
+output_raw_path = '/Users/connorcarew/ism2411-data-cleaning-copilot/data/raw/sales_data_raw.csv'
+df.to_csv(output_raw_path, index=False)  # Save without the index
+
+# Save the cleaned DataFrame to the processed directory
+output_processed_path = '/Users/connorcarew/ism2411-data-cleaning-copilot/data/processed/sales_data_clean.csv'
+df.to_csv(output_processed_path, index=False)  # Save cleaned data without the index
